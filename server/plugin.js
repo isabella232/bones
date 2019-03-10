@@ -183,11 +183,28 @@ Plugin.prototype.loadConfig = function(command) {
             if (!(key in command.options)) {
                 if (key in this.argv) {
                     // It was specified on the command line.
-                     console.warn(utils.colorize('Note: Unknown option "' + key + '".', 'yellow'));
+		    // It is not a command line argument for mocha in a test.
+		    if ( /mocha$/.test(process.argv[1]) ) {
+			if ( key != 'config' &&
+			     key != 'package' &&
+			     key != 'opts' &&
+			     key != 'diff' &&
+			     key != 'extension' &&
+			     key != 'reporter' &&
+			     key != 'slow' &&
+			     key != 'ui' ) {
+			    console.warn(utils.colorize('Note: Unknown option "' + key + '".', 'yellow'));
+			} 
+		    }
                 } else {
                     // It's from the config file.
-                    console.warn(utils.colorize('Note: Unknown option "' + key + '" in config file.', 'yellow'));
-                }
+		    // It is not a host options in a mocha test.
+		    if ( /mocha$/.test(process.argv[1]) ) {
+			if ( key != 'host' ) {
+			    console.warn(utils.colorize('Note: Unknown option "' + key + '" in config file.', 'yellow'));
+			} 
+		    }
+		}
             } else if (command.options[key].required && typeof config[key] === 'undefined') {
                 console.warn(utils.colorize('Error: "' + key + '" is required.', 'red'));
                 process.exit(2);
